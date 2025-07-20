@@ -168,10 +168,10 @@ def find_next_available_slot(busy_slots, duration_minutes, day_start, day_end):
 
 def generate_reschedule_note(agent, user_email, summary, proposed_time):
     prompt = f"""
-The proposed time {proposed_time.strftime('%Y-%m-%d %H:%M')} conflicts with the event: "{summary}" for user {user_email}.
-Please generate a polite one-liner explaining why this meeting might be difficult to reschedule.
-Focus on the importance of the event based on the summary.
-"""
+        The proposed time {proposed_time.strftime('%Y-%m-%d %H:%M')} conflicts with the event: '{summary}' for user {user_email}.
+        Please generate a polite one-liner explaining why this meeting might be difficult to reschedule.
+        Focus on the importance of the event based on the summary.
+        """
     response = agent.client.chat.completions.create(
         model="/home/user/Models/deepseek-ai/deepseek-llm-7b-chat",
         messages=[
@@ -362,3 +362,4 @@ def handle_meeting_request(input_json):
     }
 
     return output
+    
