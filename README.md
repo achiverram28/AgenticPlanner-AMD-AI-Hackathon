@@ -15,13 +15,18 @@ Test Cases:
 
 ![38674382-8AD4-49BC-BA24-CEEAB327F172_1_105_c](https://github.com/user-attachments/assets/27933fa2-bcf7-4108-b929-ae322a9de61f)
 
-## Test Case 3 : ( USERTWO is busy but USERTHREE is available )
+## Test Case 4 : ( USERTWO is busy but USERTHREE is available )
 
 ![85C6AA46-4535-48AA-8C16-47365238C934_1_105_c](https://github.com/user-attachments/assets/df00809b-6983-43bf-94f2-6311e87bbfe4)
 
 # Agentic Meeting Scheduler
 
 A fully autonomous, AI-powered meeting scheduling system that understands natural language requests, coordinates availability across Google Calendars, resolves conflicts, and adapts dynamically—all with a fast, modern large language model (LLM) at its core.
+
+## Key Features
+- Supports scheduling and reschedule a meet
+- Understands priority of the meet
+- Sends polite reschedule requests
 
 ## Features
 
