@@ -26,11 +26,9 @@ class AI_AGENT:
         return base_date + timedelta(days=days_ahead)
 
     def extract_time(self, text: str, ref: datetime) -> datetime.time:
-        # Match formats like "11:00 A.M." or "3 PM"
         time_match = re.search(r'(\d{1,2}(:\d{2})?\s*(AM|PM|A\.M\.|P\.M\.)?)', text, re.IGNORECASE)
         if time_match:
             time_str = time_match.group(0)
-            # Parse without timezone, treat as IST-local
             parsed_time = dp_parse(time_str, settings={
                 "PREFER_DATES_FROM": "future",
                 "RETURN_AS_TIMEZONE_AWARE": False
@@ -58,7 +56,7 @@ class AI_AGENT:
               "priority": ...
             }}
             """
-        # Use your LLM API call here. Example with OpenAI's GPT:
+
         response = self.client.chat.completions.create(
                 model="/home/user/Models/deepseek-ai/deepseek-llm-7b-chat",
                 messages=[{"role": "user", "content": prompt}],
@@ -71,11 +69,6 @@ class AI_AGENT:
         
 
     def parse_email(self, email_text: str, reference_date: str = None) -> dict:
-        # Parse reference date (UTC)
-        # if reference_date.endswith("Z"):
-        #     ref_dt = datetime.strptime(reference_date, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.utc)
-        # else:
-        #     ref_dt = datetime.fromisoformat(reference_date)
         try:
             ref_dt = datetime.strptime(reference_date, "%d-%m-%YT%H:%M:%S")
             ref_dt = ref_dt.replace(tzinfo=pytz.utc)  # assuming input is UTC
@@ -96,20 +89,15 @@ class AI_AGENT:
         if weekday_found is None:
             return {"DateTime": None}
 
-        # Get next occurrence of that weekday
         target_date = self.get_next_weekday_date(ref_dt, weekday_found)
 
-        # Extract time from text (assume local/IST)
         time_part = self.extract_time(email_text, ref_dt)
 
-        # Combine with IST timezone directly
         ist = pytz.timezone("Asia/Kolkata")
         combined_dt = datetime.combine(target_date.date(), time_part)
         ist_dt = ist.localize(combined_dt)
 
         return {"DateTime": ist_dt.isoformat()}
-
-# duration_minutes = 60
 
 def is_free(start_time, duration_minutes, busy_slots):
         end_time = start_time + timedelta(minutes=duration_minutes)
@@ -185,7 +173,7 @@ def generate_reschedule_note(agent, user_email, summary, proposed_time):
     
 
 def handle_meeting_request(input_json):
-    # Extract details from input
+
     request_id = input_json["Request_id"]
     email_dt = input_json["Datetime"]
     location = input_json["Location"]
@@ -207,11 +195,10 @@ def handle_meeting_request(input_json):
 
     date_only = proposed_time.date()
     ist = pytz.timezone("Asia/Kolkata")
-    day_start = ist.localize(datetime.combine(date_only, time(9, 0)))  # 9am IST
-    day_end = ist.localize(datetime.combine(date_only, time(20, 0)))   # 8pm IST
+    day_start = ist.localize(datetime.combine(date_only, time(9, 0)))  
+    day_end = ist.localize(datetime.combine(date_only, time(20, 0)))  
 
    
-    # Step 3: Gather calendar events per attendee
     user_event_map = {}
     all_events = []
 
@@ -243,11 +230,6 @@ def handle_meeting_request(input_json):
     
     negotiation_note = ""
     
-    
-    # final_start = proposed_time if is_free(proposed_time, duration_minutes, busy_slots) else find_next_available_slot(
-    #     busy_slots, duration_minutes, day_start, day_end
-    # )
-    # print(final_start)
     if is_free(proposed_time, duration_minutes, busy_slots):
         final_start = proposed_time
     else:
@@ -273,7 +255,6 @@ def handle_meeting_request(input_json):
         }
         final_start = find_next_available_slot(busy_slots, duration_minutes, day_start, day_end)
 
-    # If still no slot found, try the next 7 days
     if final_start is None:
         for offset in range(1, 8):
             future_date = date_only + timedelta(days=offset)
@@ -308,8 +289,7 @@ def handle_meeting_request(input_json):
             prop_time = proposed_time
         final_start = proposed_time
         final_end = proposed_time + timedelta(minutes=duration_minutes)
-    
-        # Find users who have conflicts
+
         conflicted_users = []
         for email in attendees + [sender]:
             if email == sender:
